@@ -8,14 +8,14 @@
 ## References
 
 ### Models
-*Project*
+**Project**
 Contains a set of tasks.
 
-*Task*
+**Task**
 Describes an individual unit of work that is part of a project
 
 ### Services
-*AI Manager*
+**AI Manager**
 Service which creates projects and tasks.
 
 ### Utilities

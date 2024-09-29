@@ -1,52 +1,31 @@
-# src/main.py
+from database.db_config import init_db, create_project, create_task, get_project, get_tasks, update_task_status
 
-from models.task import Task
-from models.project import Project
-from services.ai_manager import TellahAI
+def main():
+    # Initialize the database
+    init_db()
 
-def preview_mvp():
-    print("=== TellahAI: AI-Enhanced Project Management Tool MVP Preview ===\n")
+    # Create a sample project
+    project_id = create_project("E-commerce Platform Revamp", "Revamping our e-commerce platform with new features and optimizations")
+    print(f"Created new project with ID: {project_id}")
 
-    # Initialize TellahAI
-    tellah = TellahAI()
+    # Create some sample tasks
+    task1_id = create_task(project_id, "Implement user authentication", "Improve user authentication system", 20.5)
+    task2_id = create_task(project_id, "Optimize product search", "Implement efficient search algorithms", 15.0)
 
-    # Create a new project
-    project = tellah.create_project("E-commerce Platform Revamp")
-    print(f"Created new project: {project.name}")
+    # Retrieve and display project information
+    project = get_project(project_id)
+    print(f"Project: {project['name']}")
+    print(f"Description: {project['description']}")
 
-    # Generate tasks using AI
-    contexts = [
-        "user authentication improvements",
-        "product recommendation engine",
-        "checkout process optimization",
-        "mobile responsiveness",
-        "inventory management system"
-    ]
-    print("\nGenerating tasks using AI:")
-    for context in contexts:
-        task = tellah.generate_task(project, context)
-        print(f"- Generated task: {task.title} (ID: {task.id})")
+    # Retrieve and display tasks
+    tasks = get_tasks(project_id)
+    print("Tasks:")
+    for task in tasks:
+        print(f"- {task['title']} (Status: {task['status']})")
 
-    # Estimate time for a specific task
-    task_to_estimate = project.tasks[2]  # Choosing the third task
-    estimated_time = tellah.estimate_task(task_to_estimate)
-    print(f"\nAI Estimation for '{task_to_estimate.title}':")
-    print(f"Estimated time: {estimated_time:.2f} hours")
-
-    # Suggest next task
-    next_task = tellah.suggest_next_task(project)
-    print(f"\nAI-suggested next task: {next_task.title}")
-
-    # Update task status
-    next_task.status = "In Progress"
-    print(f"Updated task '{next_task.title}' status to: {next_task.status}")
-
-    # Generate project report
-    print("\nGenerating AI-powered Project Report:")
-    report = tellah.generate_report(project)
-    print(report)
-
-# Run the MVP preview
+    # Update a task status
+    update_task_status(task1_id, "In Progress")
+    print("Updated task 1 status to 'In Progress'")
 
 if __name__ == "__main__":
-    preview_mvp()
+    main()

@@ -1,81 +1,71 @@
 import sqlite3
-import os
+from models.project import Project
+from models.task import Task
 
-# Get the absolute path of the current script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_NAME = os.path.join(BASE_DIR, 'tellahAI.db')
-SCHEMA_FILE = os.path.join(BASE_DIR, 'schema.sql')
-
+DATABASE_NAME = 'tellahAI.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE_NAME)
     conn.row_factory = sqlite3.Row
     return conn
 
-
-def init_db():
+def create_tables():
     conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Read SQL schema
-    with open(SCHEMA_FILE, 'r') as sql_file:
-        sql_script = sql_file.read()
-
-    # Execute SQL commands
-    cursor.executescript(sql_script)
-
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS projects
+                 (id INTEGER PRIMARY KEY, name TEXT, description TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS tasks
+                 (id INTEGER PRIMARY KEY, project_id INTEGER, description TEXT, status TEXT,
+                 FOREIGN KEY(project_id) REFERENCES projects(id))''')
     conn.commit()
     conn.close()
-
 
 def create_project(name, description):
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO projects (name, description) VALUES (?, ?)',
-                   (name, description))
+    c = conn.cursor()
+    c.execute("INSERT INTO projects (name, description) VALUES (?, ?)", (name, description))
+    project_id = c.lastrowid
     conn.commit()
-    project_id = cursor.lastrowid
     conn.close()
-    return project_id
-
-
-def create_task(project_id, title, description, estimated_hours):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        'INSERT INTO tasks (project_id, title, description, estimated_hours) VALUES (?, ?, ?, ?)',
-        (project_id, title, description, estimated_hours))
-    conn.commit()
-    task_id = cursor.lastrowid
-    conn.close()
-    return task_id
-
+    return get_project(project_id)
 
 def get_project(project_id):
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM projects WHERE id = ?', (project_id, ))
-    project = cursor.fetchone()
+    c = conn.cursor()
+    c.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
+    project_data = c.fetchone()
     conn.close()
-    return project
+    if project_data:
+        return Project(project_data['id'], project_data['name'], project_data['description'])
+    return None
 
-
-def get_tasks(project_id):
+def create_task(project_id, description, status="Not Started"):
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM tasks WHERE project_id = ?', (project_id, ))
-    tasks = cursor.fetchall()
-    conn.close()
-    return tasks
-
-
-def update_task_status(task_id, status):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('UPDATE tasks SET status = ? WHERE id = ?',
-                   (status, task_id))
+    c = conn.cursor()
+    c.execute("INSERT INTO tasks (project_id, description, status) VALUES (?, ?, ?)",
+              (project_id, description, status))
+    task_id = c.lastrowid
     conn.commit()
     conn.close()
+    return get_task(task_id)
 
+def get_task(task_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    task_data = c.fetchone()
+    conn.close()
+    if task_data:
+        return Task(task_data['id'], task_data['project_id'], task_data['description'], task_data['status'])
+    return None
 
-# Add more CRUD operations as needed
+def update_task(task_id, status):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("UPDATE tasks SET status = ? WHERE id = ?", (status, task_id))
+    conn.commit()
+    conn.close()
+    return get_task(task_id)
+
+# Call this function to ensure tables are created
+create_tables()

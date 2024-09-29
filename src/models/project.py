@@ -2,12 +2,10 @@ import random
 from datetime import datetime, timedelta
 
 class Project:
-    def __init__(self, name):
+    def __init__(self, id, name, description):
+        self.id = id
         self.name = name
-        self.tasks = []
+        self.description = description
 
-    def add_task(self, task):
-        self.tasks.append(task)
-
-    def get_task_by_id(self, task_id):
-        return next((task for task in self.tasks if task.id == task_id), None)
+    def __str__(self):
+        return f"Project(id={self.id}, name='{self.name}', description='{self.description}')"

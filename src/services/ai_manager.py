@@ -1,66 +1,88 @@
-import os
 import google.generativeai as genai
-import ast
+import os
+import json
+import re
 
 class AIManager:
     def __init__(self):
-        api_key = os.getenv('GOOGLE_AI_API_KEY')
-        if not api_key:
-            raise ValueError("GOOGLE_AI_API_KEY environment variable is not set")
-        genai.configure(api_key=api_key)
+        # Set up the API key
+        genai.configure(api_key=os.environ['GOOGLE_AI_API_KEY'])
+
+        # Set up the model
         self.model = genai.GenerativeModel('gemini-pro')
 
-    def generate_tasks(self, project_description):
-        prompt = f"Given the project description: '{project_description}', generate 5 key tasks for this project. Return the tasks as a Python list of strings, without any additional formatting or explanation."
+    def generate_project_name(self, project_description):
+        prompt = f"Generate a concise and catchy project name based on this description: {project_description}"
         response = self.model.generate_content(prompt)
+        return response.text.strip()
 
-        # Extract the Python list from the response
-        response_text = response.text.strip()
-        if response_text.startswith('```python'):
-            response_text = response_text.split('```python')[1]
-        if response_text.endswith('```'):
-            response_text = response_text.rsplit('```', 1)[0]
+    def generate_tasks(self, project_description):
+        prompt = f"""
+        Based on the following project description, generate a list of 5-7 high-level tasks that would be necessary to complete the project. 
+        Return the tasks as a JSON array of strings.
 
+        Project description: {project_description}
+        """
+        response = self.model.generate_content(prompt)
+        print("Raw API response:")
+        print(response.text)
         try:
-            tasks = ast.literal_eval(response_text.strip())
-            if isinstance(tasks, list) and all(isinstance(item, str) for item in tasks):
-                return tasks
-            else:
-                raise ValueError("Response is not a list of strings")
-        except (SyntaxError, ValueError) as e:
-            print(f"Error parsing AI response: {e}")
-            print(f"Raw response: {response_text}")
-            return []
+            # Strip any markdown code block indicators
+            json_str = re.sub(r'```json\n?|\n?```', '', response.text).strip()
+            tasks = json.loads(json_str)
+            if not isinstance(tasks, list):
+                raise ValueError("API did not return a list of tasks")
+            return tasks
+        except json.JSONDecodeError as e:
+            print(f"JSON Decode Error: {str(e)}")
+            print("API response was not valid JSON. Falling back to text parsing.")
+            # Attempt to parse the text response
+            tasks = [line.strip() for line in response.text.split('\n') if line.strip() and not line.strip().startswith('```')]
+            return tasks[:7]  # Limit to 7 tasks maximum
+        except Exception as e:
+            print(f"Error parsing tasks: {str(e)}")
+            return ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5"]  # Fallback tasks
+
+    # ... (rest of the methods remain the same)
 
     def estimate_task_time(self, task_description):
-        prompt = f"Estimate the time in hours to complete this task: '{task_description}'. Return only a number."
+        prompt = f"Estimate the time in hours it would take to complete this task: {task_description}. Return only a number."
         response = self.model.generate_content(prompt)
         try:
             return float(response.text.strip())
         except ValueError:
-            print(f"Error parsing time estimate. Raw response: {response.text}")
-            return 0
+            print(f"Could not parse time estimate: {response.text}")
+            return 1  # Default to 1 hour if we can't parse the response
 
-    def suggest_next_task(self, tasks, completed_tasks):
-        incomplete_tasks = [task for task in tasks if task not in completed_tasks]
-        if not incomplete_tasks:
-            return None
-        prompt = f"Given these incomplete tasks: {incomplete_tasks}, suggest the next task to work on. Return only the task name."
+    def suggest_next_task(self, tasks):
+        task_list = "\n".join([f"- {task}" for task in tasks])
+        prompt = f"""
+        Given the following list of tasks for a project, suggest which task should be done next. Consider dependencies, complexity, and impact. Return only the name of the task.
+
+        Tasks:
+        {task_list}
+        """
         response = self.model.generate_content(prompt)
         return response.text.strip()
 
-    def generate_project_report(self, project_name, tasks, completed_tasks):
-        total_tasks = len(tasks)
-        completed_count = len(completed_tasks)
-        progress = (completed_count / total_tasks) * 100 if total_tasks > 0 else 0
+    def generate_project_report(self, project, tasks):
+        completed_tasks = sum(1 for task in tasks if task.status == "Completed")
+        progress = (completed_tasks / len(tasks)) * 100 if tasks else 0
+        task_list = "\n".join([f"- {task.description} (Status: {task.status})" for task in tasks])
 
         prompt = f"""
-        Generate a brief project report for '{project_name}' with the following information:
-        - Total Tasks: {total_tasks}
-        - Completed Tasks: {completed_count}
-        - Progress: {progress:.2f}%
+        Generate a brief project report based on the following information:
 
-        Provide a summary of the project status and any recommendations.
+        Project Name: {project.name}
+        Project Description: {project.description}
+        Total Tasks: {len(tasks)}
+        Completed Tasks: {completed_tasks}
+        Progress: {progress:.2f}%
+
+        Task List:
+        {task_list}
+
+        Provide a summary of the project status, highlight key achievements, and suggest next steps.
         """
         response = self.model.generate_content(prompt)
         return response.text.strip()

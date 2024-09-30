@@ -86,3 +86,30 @@ class AIManager:
         """
         response = self.model.generate_content(prompt)
         return response.text.strip()
+
+    def update_task_status(self, task_description, current_status, project_context):
+        prompt = f"""
+        Given the following task and its current status, suggest an appropriate updated status.
+        Consider the project context and typical project management stages.
+        Return only the suggested status as a single word or short phrase.
+    
+        Task: {task_description}
+        Current Status: {current_status}
+        Project Context: {project_context}
+        """
+        response = self.model.generate_content(prompt)
+        return response.text.strip()
+
+    def update_task_status_from_prompt(self, user_prompt, project_name, task_description, current_status):
+        prompt = f"""
+        Based on the following user prompt, suggest an appropriate updated status for the task.
+        Consider the project context and typical project management stages.
+        Return only the suggested status as a single word or short phrase.
+
+        User Prompt: {user_prompt}
+        Project: {project_name}
+        Task: {task_description}
+        Current Status: {current_status}
+        """
+        response = self.model.generate_content(prompt)
+        return response.text.strip()

@@ -8,13 +8,10 @@ def init_db():
     conn = sqlite3.connect(DATABASE_NAME)
     c = conn.cursor()
 
-    # Drop existing tables if they exist
-    c.execute("DROP TABLE IF EXISTS tasks")
-    c.execute("DROP TABLE IF EXISTS projects")
-
-    c.execute('''CREATE TABLE projects
+    # Create tables if they don't exist
+    c.execute('''CREATE TABLE IF NOT EXISTS projects
                  (id INTEGER PRIMARY KEY, name TEXT, description TEXT)''')
-    c.execute('''CREATE TABLE tasks
+    c.execute('''CREATE TABLE IF NOT EXISTS tasks
                  (id INTEGER PRIMARY KEY, description TEXT, status TEXT, 
                   estimated_time REAL, project_id INTEGER,
                   FOREIGN KEY(project_id) REFERENCES projects(id))''')
@@ -69,3 +66,19 @@ def get_project_by_id(project_id):
     if project_data:
         return Project(id=project_data[0], name=project_data[1], description=project_data[2])
     return None
+
+def get_all_projects():
+    conn = sqlite3.connect(DATABASE_NAME)
+    c = conn.cursor()
+    c.execute("SELECT id, name, description FROM projects")
+    projects = [Project(id=row[0], name=row[1], description=row[2]) for row in c.fetchall()]
+    conn.close()
+    return projects
+
+def get_tasks_by_project_id(project_id):
+    conn = sqlite3.connect(DATABASE_NAME)
+    c = conn.cursor()
+    c.execute("SELECT id, description, status, estimated_time, project_id FROM tasks WHERE project_id = ?", (project_id,))
+    tasks = [Task(id=row[0], description=row[1], status=row[2], estimated_time=row[3], project_id=row[4]) for row in c.fetchall()]
+    conn.close()
+    return tasks

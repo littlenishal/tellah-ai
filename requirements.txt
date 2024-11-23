@@ -1,4 +1,0 @@
-#anthropic==0.3.6
-google-generativeai==0.3.1
-pydantic==1.10.7
-SQLAlchemy==1.4.31

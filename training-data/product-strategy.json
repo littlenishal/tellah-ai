@@ -1,0 +1,1270 @@
+training_data_final = [
+  # Data Monetization Strategy
+  {
+      "text_input": "How should we develop a data monetization strategy for our payment processing platform?",
+      "output": """Data Monetization Strategy Framework:
+
+1. Data Asset Inventory
+Primary Data Sets:
+- Transaction patterns
+- Merchant performance
+- Consumer behavior
+- Industry trends
+- Geographic insights
+
+Data Quality Metrics:
+- Completeness: 98%
+- Accuracy: 99.9%
+- Freshness: Real-time
+- Coverage: National
+- Granularity: Transaction-level
+
+2. Product Offerings
+Anonymized Analytics:
+- Industry benchmarks
+- Market insights
+- Trend reports
+- Performance metrics
+- Risk indicators
+
+Custom Solutions:
+- Predictive models
+- Risk scoring
+- Market analysis
+- Custom reports
+- API access
+
+3. Compliance Framework
+Privacy Requirements:
+- Data anonymization
+- Consent management
+- Usage restrictions
+- Access controls
+- Audit trails
+
+Regulatory Compliance:
+- GDPR standards
+- CCPA requirements
+- Banking regulations
+- Data protection
+- Industry standards
+
+4. Revenue Model
+Pricing Structure:
+- Subscription tiers
+- Usage-based fees
+- Custom pricing
+- Volume discounts
+- Partner rates
+
+Success Metrics:
+- Revenue per dataset
+- Client adoption
+- Usage patterns
+- ROI measures
+- Market penetration"""
+  },
+
+  # Partnership Ecosystem
+  {
+      "text_input": "Create a strategy for building a partnership ecosystem for our lending platform.",
+      "output": """Partnership Ecosystem Strategy:
+
+1. Partner Categories
+Core Partners:
+- Banking providers
+- Credit bureaus
+- Payment processors
+- Identity verifiers
+- Insurance providers
+
+Distribution Partners:
+- Financial advisors
+- Real estate agents
+- Business services
+- Industry platforms
+- Professional associations
+
+2. Value Proposition
+Partner Benefits:
+- Revenue sharing
+- Market access
+- Product integration
+- Data insights
+- Co-marketing
+
+Platform Benefits:
+- Customer acquisition
+- Product expansion
+- Market penetration
+- Risk reduction
+- Operational scale
+
+3. Integration Framework
+Technical Integration:
+- API connectivity
+- Data exchange
+- Security protocols
+- Performance SLAs
+- Support systems
+
+Operational Integration:
+- Onboarding process
+- Training programs
+- Support structure
+- Performance monitoring
+- Quality assurance
+
+4. Growth Strategy
+Partner Acquisition:
+- Target identification
+- Value alignment
+- Integration planning
+- Contract negotiation
+- Launch support
+
+Success Metrics:
+- Partner revenue
+- Integration success
+- Customer satisfaction
+- Market expansion
+- Operational efficiency"""
+  },
+
+  # Product Security Framework
+  {
+      "text_input": "Design a comprehensive product security strategy for our fintech platform.",
+      "output": """Product Security Strategy:
+
+1. Security Architecture
+Core Components:
+- Authentication system
+- Authorization framework
+- Encryption standards
+- Monitoring tools
+- Incident response
+
+Technical Requirements:
+- Multi-factor auth
+- Role-based access
+- End-to-end encryption
+- Real-time monitoring
+- Automated alerts
+
+2. Implementation Plan
+Security Layers:
+- Application security
+- Data protection
+- Network security
+- Cloud security
+- API security
+
+Development Practice:
+- Secure coding
+- Regular testing
+- Vulnerability scanning
+- Penetration testing
+- Code reviews
+
+3. Compliance Integration
+Regulatory Requirements:
+- SOC 2 compliance
+- PCI DSS standards
+- Banking regulations
+- Privacy laws
+- Industry standards
+
+Documentation:
+- Security policies
+- Procedure guides
+- Incident playbooks
+- Audit trails
+- Training materials
+
+4. Monitoring & Response
+Detection Systems:
+- Threat monitoring
+- Fraud detection
+- Anomaly detection
+- Access monitoring
+- Performance tracking
+
+Incident Response:
+- Response team
+- Communication plan
+- Recovery procedures
+- Post-mortem analysis
+- Improvement process"""
+  },
+
+  # Customer Segmentation
+  {
+      "text_input": "Develop a customer segmentation strategy for our financial services platform.",
+      "output": """Customer Segmentation Strategy:
+
+1. Segment Definitions
+Primary Segments:
+Small Business:
+- Revenue: $100K-$1M
+- Employees: 2-20
+- Industry: Service/Retail
+- Banking needs: Basic
+- Growth stage: Early
+
+Mid-Market:
+- Revenue: $1M-$10M
+- Employees: 20-100
+- Industry: Various
+- Banking needs: Moderate
+- Growth stage: Expanding
+
+Enterprise:
+- Revenue: $10M+
+- Employees: 100+
+- Industry: All
+- Banking needs: Complex
+- Growth stage: Mature
+
+2. Product Alignment
+Feature Sets:
+Basic Package:
+- Payment processing
+- Basic banking
+- Simple reporting
+- Mobile access
+- Email support
+
+Advanced Package:
+- Cash management
+- Team accounts
+- API access
+- Custom reports
+- Priority support
+
+Enterprise Solution:
+- Treasury services
+- Custom integration
+- Dedicated support
+- White-label options
+- Advanced security
+
+3. Go-to-Market Strategy
+Channel Strategy:
+- Direct digital
+- Sales team
+- Partner network
+- Industry events
+- Content marketing
+
+Success Metrics:
+- Segment penetration
+- Revenue per segment
+- Customer satisfaction
+- Product adoption
+- Retention rates"""
+  },
+
+  # Growth Hacking Framework
+  {
+      "text_input": "Create a growth hacking framework for our digital banking platform.",
+      "output": """Growth Hacking Strategy:
+
+1. Acquisition Channels
+Digital Marketing:
+- SEO optimization
+- Content marketing
+- Paid advertising
+- Social media
+- Email campaigns
+
+Partnership Growth:
+- Integration partners
+- Referral programs
+- Co-marketing
+- Industry alliances
+- Affiliate networks
+
+2. Activation Strategy
+Onboarding Flow:
+- Quick registration
+- Value demonstration
+- Feature education
+- Early wins
+- Support access
+
+Success Metrics:
+- Activation rate: 60%+
+- Time to value: <24hrs
+- Feature adoption: 40%+
+- Support tickets: <10%
+- Referral rate: 20%+
+
+3. Retention Tactics
+Engagement Tools:
+- Push notifications
+- Email nurture
+- Product updates
+- Usage incentives
+- Feedback loops
+
+Churn Prevention:
+- Usage monitoring
+- Risk indicators
+- Intervention points
+- Recovery programs
+- Exit surveys
+
+4. Growth Experiments
+Testing Framework:
+- A/B testing
+- Feature trials
+- Pricing tests
+- Message testing
+- Channel optimization
+
+Success Criteria:
+- User growth: 20%+ MoM
+- CAC reduction: 15%+
+- LTV increase: 25%+
+- Churn reduction: -5%
+- NPS improvement: +10"""
+  },
+# Product-Market Fit Assessment
+    {
+      "text_input": "How should we evaluate product-market fit for our new business expense management platform?",
+      "output": """Product-Market Fit Assessment Framework:
+
+1. Usage Metrics Analysis
+Core Metrics:
+- Weekly active usage: >60% of users
+- Feature adoption: >40% of core features
+- NPS score: >50
+- User retention: >80% at 90 days
+- Organic growth: >30% of new users
+
+2. Customer Segments Performance
+Target Segment (Series A-C Startups):
+- Average monthly spend: $50K-$500K
+- Team size: 20-200 employees
+- Industry: Tech, Services
+- Pain point alignment: 80%
+- Willingness to pay: $20-50 per user
+
+3. Value Proposition Validation
+Problem Solution Fit:
+- Time saved: >5 hours/week
+- Cost reduction: >20%
+- Policy compliance: >95%
+- Employee satisfaction: >8/10
+- Integration success: >90%
+
+4. Growth Indicators
+Positive Signals:
+- Word-of-mouth referrals
+- Expansion within companies
+- Feature request engagement
+- Support ticket patterns
+- Usage depth increase
+
+5. Economics Validation
+Unit Economics:
+- CAC payback: <12 months
+- Gross margin: >70%
+- Net revenue retention: >120%
+- Expansion revenue: >20%
+- Churn rate: <2% monthly"""
+  },
+
+    # Innovation Strategy
+    {
+      "text_input": "Develop an innovation strategy for adding AI capabilities to our lending platform.",
+      "output": """AI Innovation Strategy for Lending Platform:
+
+1. Core AI Initiatives
+Risk Assessment:
+- Credit scoring enhancement
+- Fraud detection
+- Income verification
+- Bank statement analysis
+- Behavioral scoring
+
+Customer Experience:
+- Application automation
+- Document processing
+- Chatbot support
+- Personalized offers
+- Price optimization
+
+2. Implementation Phases
+Phase 1: Foundation (Q1-Q2)
+- Data infrastructure setup
+- Model development framework
+- Initial model training
+- Compliance framework
+- Testing environment
+
+Phase 3: Advanced Features (Q3-Q4)
+- Automated underwriting
+- Real-time risk scoring
+- Predictive analytics
+- Customer insights
+- Portfolio optimization
+
+3. Success Metrics
+Business Impact:
+- 30% faster approvals
+- 20% lower defaults
+- 15% cost reduction
+- 25% higher automation
+- 40% better accuracy
+
+Risk Management:
+- Model explainability
+- Bias detection
+- Compliance monitoring
+- Error tracking
+- Performance drift
+
+4. Competitive Advantage
+- Proprietary algorithms
+- Unique data sources
+- Process automation
+- Customer experience
+- Scale efficiency"""
+  },
+
+    # Product Portfolio Strategy
+    {
+      "text_input": "How should we structure our product portfolio for a comprehensive SMB financial platform?",
+      "output": """SMB Financial Platform Portfolio Strategy:
+
+1. Core Banking Suite
+Essential Services:
+- Business checking
+- Savings accounts
+- Payment processing
+- Card issuing
+- Basic lending
+
+Revenue Model:
+- Monthly subscriptions
+- Transaction fees
+- Interest spread
+- Interchange fees
+- Service fees
+
+2. Growth Products
+Financial Tools:
+- Expense management
+- Invoicing system
+- Payroll integration
+- Tax preparation
+- Cash flow planning
+
+Revenue Streams:
+- Premium features
+- Integration fees
+- Partner revenue
+- Data monetization
+- Value-added services
+
+3. Future Expansion
+Advanced Services:
+- Treasury management
+- International banking
+- Trade finance
+- Equipment financing
+- Working capital
+
+Market Positioning:
+- Vertical specialization
+- Industry focus
+- Size segmentation
+- Geographic expansion
+- Partner ecosystem
+
+4. Integration Strategy
+Core Systems:
+- Accounting software
+- ERP systems
+- E-commerce platforms
+- CRM tools
+- Industry-specific solutions"""
+  },
+
+    # Pricing Strategy
+    {
+      "text_input": "Design a pricing strategy for a new B2B payments platform.",
+      "output": """B2B Payments Platform Pricing Strategy:
+
+1. Pricing Structure
+Tiered Model:
+Starter ($199/month):
+- Up to 100 transactions
+- Basic features
+- Email support
+- Standard processing
+- Basic reporting
+
+Growth ($499/month):
+- Up to 500 transactions
+- Advanced features
+- Priority support
+- Same-day processing
+- Advanced analytics
+
+Enterprise (Custom):
+- Unlimited transactions
+- Full feature set
+- Dedicated support
+- Custom integration
+- White-label options
+
+2. Fee Components
+Transaction Fees:
+- ACH: 0.5% + $0.25
+- Card: 2.9% + $0.30
+- Wire: $15 flat
+- International: 1% + fx
+- Returns: $25
+
+Add-on Services:
+- API access: +$199/month
+- Custom reporting: +$99/month
+- Fraud prevention: +$149/month
+- Multi-currency: +$299/month
+- Batch processing: +$199/month
+
+3. Market Positioning
+Competitive Analysis:
+- 15% below enterprise providers
+- 20% above basic solutions
+- Value-based differentiation
+- Feature comparison
+- Service level alignment
+
+4. Growth Strategy
+Monetization Path:
+- Land and expand
+- Feature upsell
+- Volume discounts
+- Partner incentives
+- Loyalty rewards"""
+  },
+
+    # Platform Expansion
+    {
+      "text_input": "Create a strategy for expanding our lending platform into embedded finance.",
+      "output": """Embedded Finance Expansion Strategy:
+
+1. Product Configuration
+API Products:
+- Credit decisioning
+- Loan origination
+- Payment processing
+- Identity verification
+- Risk assessment
+
+Integration Options:
+- REST APIs
+- SDK implementation
+- White-label solution
+- Webhook notifications
+- Documentation portal
+
+2. Target Partners
+Primary Segments:
+- E-commerce platforms
+- SaaS providers
+- Vertical software
+- Marketplaces
+- Service providers
+
+Partner Requirements:
+- Transaction volume
+- Customer base size
+- Technical capability
+- Compliance status
+- Market alignment
+
+3. Revenue Model
+Fee Structure:
+- API call pricing
+- Revenue sharing
+- Minimum guarantees
+- Volume discounts
+- Setup fees
+
+Partnership Terms:
+- Contract length
+- Exclusivity options
+- Support levels
+- SLA requirements
+- Compliance needs
+
+4. Success Metrics
+Business Goals:
+- Partner adoption rate
+- Integration success
+- Revenue per partner
+- Customer satisfaction
+- Portfolio performance"""
+  },
+
+    # Product Localization
+    {
+      "text_input": "How should we approach localizing our fintech product for international markets?",
+      "output": """Fintech Product Localization Strategy:
+
+1. Market Selection
+Priority Markets:
+- Market size
+- Regulatory ease
+- Competition level
+- Technical feasibility
+- Cultural fit
+
+Entry Requirements:
+- Licensing needs
+- Capital requirements
+- Partner availability
+- Infrastructure needs
+- Compliance costs
+
+2. Product Adaptation
+Local Requirements:
+- Payment methods
+- KYC processes
+- Currency handling
+- Tax compliance
+- Language support
+
+Technical Changes:
+- Data localization
+- Processing rules
+- Integration needs
+- Security standards
+- Performance optimization
+
+3. Go-to-Market Plan
+Market Entry:
+- Local partnerships
+- Regulatory approval
+- Team building
+- Marketing strategy
+- Support structure
+
+Timeline:
+- Market research
+- Product adaptation
+- Compliance setup
+- Partner onboarding
+- Launch sequence
+
+4. Success Criteria
+Performance Metrics:
+- Market penetration
+- User adoption
+- Revenue goals
+- Compliance status
+- Partner satisfaction"""
+  },
+
+    # Digital Transformation
+    {
+      "text_input": "Outline a strategy for helping traditional lenders digitize their loan origination process.",
+      "output": """Loan Origination Digitization Strategy:
+
+1. Digital Infrastructure
+Core Components:
+- Online application
+- Document upload
+- Identity verification
+- Credit check
+- Decision engine
+
+Integration Points:
+- Core banking system
+- CRM platform
+- Credit bureaus
+- Payment processors
+- Documentation system
+
+2. Process Automation
+Key Workflows:
+- Application intake
+- Document verification
+- Credit analysis
+- Decision making
+- Closing process
+
+Automation Targets:
+- 80% touchless processing
+- 24-hour decisions
+- 90% digital closing
+- 50% cost reduction
+- 2x throughput
+
+3. Change Management
+Stakeholder Engagement:
+- Executive buy-in
+- Staff training
+- Process mapping
+- KPI tracking
+- Feedback loops
+
+Risk Mitigation:
+- Compliance checks
+- Security reviews
+- Data protection
+- Process validation
+- Audit trails
+
+4. Implementation Plan
+Phases:
+- Pilot program
+- Department rollout
+- Full deployment
+- Optimization
+- Scale support"""
+  },
+
+    # Product Sunset
+    {
+      "text_input": "How should we plan the sunset of our legacy payment processing system?",
+      "output": """Legacy System Sunset Strategy:
+
+1. Impact Assessment
+Stakeholder Analysis:
+- Active users: 1,
+      200
+- Transaction volume: $50M/month
+- Revenue impact: $2M annual
+- Integration partners: 15
+- Support tickets: 200/month
+
+Resource Allocation:
+- Development team
+- Support staff
+- Operations team
+- Compliance officers
+- Partner managers
+
+2. Migration Plan
+Customer Communication:
+- 12-month timeline
+- Migration options
+- Support resources
+- Incentive program
+- Deadline reminders
+
+Technical Migration:
+- Data export tools
+- API migration
+- Testing environment
+- Validation process
+- Cutover plan
+
+3. Risk Mitigation
+Business Continuity:
+- Parallel running
+- Backup systems
+- Rollback plan
+- Support extension
+- Contract management
+
+Compliance Requirements:
+- Data retention
+- Audit trails
+- Legal obligations
+- Reporting needs
+- Archive access
+
+4. Success Metrics
+Migration Success:
+- 100% user migration
+- Zero data loss
+- Minimal disruption
+- Cost savings
+- Customer satisfaction"""
+  },
+
+    # Customer Feedback Integration
+    {
+      "text_input": "Design a framework for integrating customer feedback into our product development process.",
+      "output": """Customer Feedback Integration Framework:
+
+1. Data Collection
+Feedback Channels:
+- In-app surveys
+- Support tickets
+- User interviews
+- Usage analytics
+- NPS responses
+
+Collection Methods:
+- Automated triggers
+- Regular check-ins
+- Feature surveys
+- Beta testing
+- Focus groups
+
+2. Analysis Process
+Categorization:
+- Feature requests
+- Bug reports
+- UX feedback
+- Performance issues
+- Strategic input
+
+Prioritization Criteria:
+- User impact
+- Business value
+- Technical effort
+- Strategic fit
+- Resource availability
+
+3. Implementation Strategy
+Action Items:
+- Quick wins
+- Major features
+- Bug fixes
+- UX improvements
+- Strategic changes
+
+Timeline Planning:
+- Weekly reviews
+- Monthly planning
+- Quarterly roadmap
+- Annual strategy
+- Continuous monitoring
+
+4. Communication Loop
+Stakeholder Updates:
+- Customer communication
+- Team alignment
+- Executive reporting
+- Partner updates
+- Public roadmap"""
+  },
+
+    # API Product Strategy
+    {
+      "text_input": "What strategy should we use for monetizing our financial API products?",
+      "output": """Financial API Monetization Strategy:
+
+1. Product Tiers
+Basic Tier ($500/month):
+- 100K API calls
+- Core endpoints
+- Standard support
+- Basic documentation
+- Testing environment
+
+Business Tier ($2,
+      000/month):
+- 500K API calls
+- Full endpoint access
+- Priority support
+- Advanced docs
+- Staging environment
+
+Enterprise Tier (Custom):
+- Unlimited calls
+- Custom endpoints
+- Dedicated support
+- Custom solutions
+- Multiple environments
+
+2. Pricing Components
+Usage Based:
+- API call volume
+- Data processing
+- Storage needs
+- Feature access
+- Support level
+
+Value Based:
+- Transaction value
+- Business impact
+- Integration depth
+- Partner status
+- Market access
+
+3. Go-to-Market
+Target Segments:
+- Fintech startups
+- Enterprise clients
+- Platform partners
+- System integrators
+- Developers
+
+Channel Strategy:
+- Direct sales
+- Self-service
+- Partner network
+- Developer community
+- Marketplace listing
+
+4. Success Metrics
+Performance Indicators:
+- API adoption
+- Revenue growth
+- Usage patterns
+- Customer satisfaction
+- Partner success"""
+  },
+# Data Monetization Strategy
+{
+      "text_input": "How should we develop a data monetization strategy for our payment processing platform?",
+      "output": """Data Monetization Strategy Framework:
+
+1. Data Asset Inventory
+Primary Data Sets:
+- Transaction patterns
+- Merchant performance
+- Consumer behavior
+- Industry trends
+- Geographic insights
+
+Data Quality Metrics:
+- Completeness: 98%
+- Accuracy: 99.9%
+- Freshness: Real-time
+- Coverage: National
+- Granularity: Transaction-level
+
+2. Product Offerings
+Anonymized Analytics:
+- Industry benchmarks
+- Market insights
+- Trend reports
+- Performance metrics
+- Risk indicators
+
+Custom Solutions:
+- Predictive models
+- Risk scoring
+- Market analysis
+- Custom reports
+- API access
+
+3. Compliance Framework
+Privacy Requirements:
+- Data anonymization
+- Consent management
+- Usage restrictions
+- Access controls
+- Audit trails
+
+Regulatory Compliance:
+- GDPR standards
+- CCPA requirements
+- Banking regulations
+- Data protection
+- Industry standards
+
+4. Revenue Model
+Pricing Structure:
+- Subscription tiers
+- Usage-based fees
+- Custom pricing
+- Volume discounts
+- Partner rates
+
+Success Metrics:
+- Revenue per dataset
+- Client adoption
+- Usage patterns
+- ROI measures
+- Market penetration"""
+  },
+
+# Partnership Ecosystem
+{
+      "text_input": "Create a strategy for building a partnership ecosystem for our lending platform.",
+      "output": """Partnership Ecosystem Strategy:
+
+1. Partner Categories
+Core Partners:
+- Banking providers
+- Credit bureaus
+- Payment processors
+- Identity verifiers
+- Insurance providers
+
+Distribution Partners:
+- Financial advisors
+- Real estate agents
+- Business services
+- Industry platforms
+- Professional associations
+
+2. Value Proposition
+Partner Benefits:
+- Revenue sharing
+- Market access
+- Product integration
+- Data insights
+- Co-marketing
+
+Platform Benefits:
+- Customer acquisition
+- Product expansion
+- Market penetration
+- Risk reduction
+- Operational scale
+
+3. Integration Framework
+Technical Integration:
+- API connectivity
+- Data exchange
+- Security protocols
+- Performance SLAs
+- Support systems
+
+Operational Integration:
+- Onboarding process
+- Training programs
+- Support structure
+- Performance monitoring
+- Quality assurance
+
+4. Growth Strategy
+Partner Acquisition:
+- Target identification
+- Value alignment
+- Integration planning
+- Contract negotiation
+- Launch support
+
+Success Metrics:
+- Partner revenue
+- Integration success
+- Customer satisfaction
+- Market expansion
+- Operational efficiency"""
+  },
+
+# Product Security Framework
+{
+      "text_input": "Design a comprehensive product security strategy for our fintech platform.",
+      "output": """Product Security Strategy:
+
+1. Security Architecture
+Core Components:
+- Authentication system
+- Authorization framework
+- Encryption standards
+- Monitoring tools
+- Incident response
+
+Technical Requirements:
+- Multi-factor auth
+- Role-based access
+- End-to-end encryption
+- Real-time monitoring
+- Automated alerts
+
+2. Implementation Plan
+Security Layers:
+- Application security
+- Data protection
+- Network security
+- Cloud security
+- API security
+
+Development Practice:
+- Secure coding
+- Regular testing
+- Vulnerability scanning
+- Penetration testing
+- Code reviews
+
+3. Compliance Integration
+Regulatory Requirements:
+- SOC 2 compliance
+- PCI DSS standards
+- Banking regulations
+- Privacy laws
+- Industry standards
+
+Documentation:
+- Security policies
+- Procedure guides
+- Incident playbooks
+- Audit trails
+- Training materials
+
+4. Monitoring & Response
+Detection Systems:
+- Threat monitoring
+- Fraud detection
+- Anomaly detection
+- Access monitoring
+- Performance tracking
+
+Incident Response:
+- Response team
+- Communication plan
+- Recovery procedures
+- Post-mortem analysis
+- Improvement process"""
+  },
+
+# Customer Segmentation
+{
+      "text_input": "Develop a customer segmentation strategy for our financial services platform.",
+      "output": """Customer Segmentation Strategy:
+
+1. Segment Definitions
+Primary Segments:
+Small Business:
+- Revenue: $100K-$1M
+- Employees: 2-20
+- Industry: Service/Retail
+- Banking needs: Basic
+- Growth stage: Early
+
+Mid-Market:
+- Revenue: $1M-$10M
+- Employees: 20-100
+- Industry: Various
+- Banking needs: Moderate
+- Growth stage: Expanding
+
+Enterprise:
+- Revenue: $10M+
+- Employees: 100+
+- Industry: All
+- Banking needs: Complex
+- Growth stage: Mature
+
+2. Product Alignment
+Feature Sets:
+Basic Package:
+- Payment processing
+- Basic banking
+- Simple reporting
+- Mobile access
+- Email support
+
+Advanced Package:
+- Cash management
+- Team accounts
+- API access
+- Custom reports
+- Priority support
+
+Enterprise Solution:
+- Treasury services
+- Custom integration
+- Dedicated support
+- White-label options
+- Advanced security
+
+3. Go-to-Market Strategy
+Channel Strategy:
+- Direct digital
+- Sales team
+- Partner network
+- Industry events
+- Content marketing
+
+Success Metrics:
+- Segment penetration
+- Revenue per segment
+- Customer satisfaction
+- Product adoption
+- Retention rates"""
+  },
+
+# Growth Hacking Framework
+{
+      "text_input": "Create a growth hacking framework for our digital banking platform.",
+      "output": """Growth Hacking Strategy:
+
+1. Acquisition Channels
+Digital Marketing:
+- SEO optimization
+- Content marketing
+- Paid advertising
+- Social media
+- Email campaigns
+
+Partnership Growth:
+- Integration partners
+- Referral programs
+- Co-marketing
+- Industry alliances
+- Affiliate networks
+
+2. Activation Strategy
+Onboarding Flow:
+- Quick registration
+- Value demonstration
+- Feature education
+- Early wins
+- Support access
+
+Success Metrics:
+- Activation rate: 60%+
+- Time to value: <24hrs
+- Feature adoption: 40%+
+- Support tickets: <10%
+- Referral rate: 20%+
+
+3. Retention Tactics
+Engagement Tools:
+- Push notifications
+- Email nurture
+- Product updates
+- Usage incentives
+- Feedback loops
+
+Churn Prevention:
+- Usage monitoring
+- Risk indicators
+- Intervention points
+- Recovery programs
+- Exit surveys
+
+4. Growth Experiments
+Testing Framework:
+- A/B testing
+- Feature trials
+- Pricing tests
+- Message testing
+- Channel optimization
+
+Success Criteria:
+- User growth: 20%+ MoM
+- CAC reduction: 15%+
+- LTV increase: 25%+
+- Churn reduction: -5%
+- NPS improvement: +10"""
+  }
+]
+
+# This completes our 20-example dataset for product strategy scenarios.
+# The complete dataset now covers:
+# 1. Market analysis
+# 2. Feature prioritization
+# 3. Product vision
+# 4. Go-to-market strategy
+# 5. Product metrics
+# 6. Product-market fit
+# 7. Innovation strategy
+# 8. Product portfolio
+# 9. Pricing strategy
+# 10. Platform expansion
+# 11. Product localization
+# 12. Digital transformation
+# 13. Product sunset
+# 14. Customer feedback
+# 15. API strategy
+# 16. Data monetization
+# 17. Partnership ecosystem
+# 18. Product security
+# 19. Customer segmentation
+# 20. Growth hacking

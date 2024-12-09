@@ -28,7 +28,12 @@ app.use('/api/analysis', analysisRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'healthy' });
+  res.status(200).json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Error handling middleware
@@ -40,10 +45,14 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-const PORT = process.env.PORT || 3000;
+// For local development
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// For Vercel serverless functions
 export default app;
+export const handler = app;

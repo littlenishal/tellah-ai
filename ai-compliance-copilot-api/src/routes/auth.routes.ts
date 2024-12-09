@@ -19,6 +19,6 @@ authRoutes.post('/verify-email', verifyEmail);
 
 // Protected routes (require authentication)
 authRoutes.post('/signout', signout);
-authRoutes.get('/me', authenticateToken, getCurrentUser);
+authRoutes.get('/current-user', authenticateToken, getCurrentUser);
 
 export default authRoutes;

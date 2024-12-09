@@ -44,7 +44,8 @@ export const authController = {
         email: data.user.email,
         role: 'user', // Default role
         first_name: firstName,
-        last_name: lastName
+        last_name: lastName,
+        auth_provider: 'email' // Explicitly set auth provider
       };
 
       const { error: userTableError } = await supabase

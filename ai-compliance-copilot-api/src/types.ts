@@ -8,6 +8,7 @@ export interface User {
   role?: string;
   first_name?: string;
   last_name?: string;
+  auth_provider?: string;
   metadata?: Record<string, any>;
 }
 

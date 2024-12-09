@@ -5,26 +5,23 @@ import path from 'path';
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// Ensure environment variables are loaded
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.NODE_ENV === 'production' 
+  ? process.env.PROD_API_URL 
+  : process.env.LOCAL_API_URL;
 
-if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
-  console.error('Supabase configuration is incomplete');
-  process.exit(1);
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase configuration');
 }
 
-// Create Supabase client with service role key for admin operations
-export const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false
-  }
-});
-
-// Create a separate client for authentication
-export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: false
+    persistSession: true,
+    autoRefreshToken: true,
+    // Configure email redirect URLs based on environment
+    redirectTo: process.env.NODE_ENV === 'production' 
+      ? process.env.PROD_FRONTEND_URL 
+      : process.env.LOCAL_FRONTEND_URL
   }
 });

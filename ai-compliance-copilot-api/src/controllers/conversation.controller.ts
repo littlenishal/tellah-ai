@@ -50,11 +50,23 @@ export const getConversations = async (
   try {
     const userId = req.user!.id;
 
+    console.log('Fetching conversations for user:', {
+      userId,
+      userObject: req.user,
+      userEmail: req.user?.email
+    });
+
     const { data, error } = await supabase
       .from('conversations')
       .select('*')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false });
+
+    console.log('Supabase query result:', {
+      data,
+      error,
+      queryUserId: userId
+    });
 
     if (error) {
       console.error('Supabase select error:', error);

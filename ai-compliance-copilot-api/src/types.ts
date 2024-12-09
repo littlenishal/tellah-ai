@@ -9,6 +9,7 @@ export interface User {
   first_name?: string;
   last_name?: string;
   auth_provider?: string;
+  email_verified?: boolean;
   metadata?: Record<string, any>;
 }
 

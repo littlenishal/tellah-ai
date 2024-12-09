@@ -159,5 +159,51 @@ export const authController = {
       console.error('Get current user error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  }
+  },
+
+  // Verify email
+  async verifyEmail(req: Request, res: Response) {
+    try {
+      const { token } = req.body;
+
+      if (!token) {
+        return res.status(400).json({ error: 'Verification token is required' });
+      }
+
+      // Verify email with Supabase
+      const { data, error } = await supabase.auth.verifyOtp({
+        type: 'email',
+        email: req.body.email, // Add the email property
+        token: token
+      });
+
+      if (error) {
+        console.error('Email verification error:', error);
+        return res.status(400).json({ 
+          error: 'Email verification failed', 
+          details: error.message 
+        });
+      }
+
+      // Update user record to mark as verified if needed
+      if (data.user) {
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ email_verified: true })
+          .eq('id', data.user.id);
+
+        if (updateError) {
+          console.warn('Could not update user verification status:', updateError);
+        }
+      }
+
+      res.status(200).json({ 
+        message: 'Email verified successfully',
+        user: data.user 
+      });
+    } catch (error) {
+      console.error('Unexpected email verification error:', error);
+      res.status(500).json({ error: 'Internal server error during email verification' });
+    }
+  },
 };

@@ -6,7 +6,7 @@ export const authController = {
   // Sign up a new user
   async signUp(req: Request & { user?: ExtendedUser }, res: Response) {
     try {
-      const { email, password, ...metadata } = req.body;
+      const { email, password, firstName, lastName, ...additionalMetadata } = req.body;
 
       // Validate input
       if (!email || !password) {
@@ -19,7 +19,7 @@ export const authController = {
         password,
         options: {
           // Optional: add additional user metadata
-          data: metadata
+          data: { firstName, lastName, ...additionalMetadata }
         }
       });
 
@@ -39,21 +39,20 @@ export const authController = {
       }
 
       // Create a corresponding user record in the users table
+      const userRecord = {
+        id: data.user.id,
+        email: data.user.email,
+        role: 'user', // Default role
+        first_name: firstName,
+        last_name: lastName
+      };
+
       const { error: userTableError } = await supabase
         .from('users')
-        .insert({
-          id: data.user.id,
-          email: data.user.email,
-          role: 'user', // Default role
-          metadata: {
-            ...metadata,
-            created_at: new Date().toISOString()
-          }
-        });
+        .insert(userRecord);
 
       if (userTableError) {
         console.error('User table insertion error:', userTableError);
-        // Optionally, you might want to delete the auth user if this fails
         return res.status(500).json({ 
           error: 'User profile creation failed', 
           details: userTableError.message 
@@ -65,6 +64,8 @@ export const authController = {
         user: {
           id: data.user.id,
           email: data.user.email,
+          firstName,
+          lastName
         },
         message: 'User created successfully' 
       });

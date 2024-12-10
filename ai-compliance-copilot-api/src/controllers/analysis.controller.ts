@@ -10,7 +10,11 @@ export const analyzeText = async (req: Request, res: Response) => {
       params: req.params
     });
 
-    const { text, conversation_id } = req.body;
+    const { 
+      text, 
+      conversation_id, 
+      context = 'general financial compliance' 
+    } = req.body;
     
     if (!text) {
       console.error('Missing text content');
@@ -26,7 +30,11 @@ export const analyzeText = async (req: Request, res: Response) => {
       console.log('Gemini Model Used:', model.model);
       
       result = await model.generateContent(`
-        You are a financial document compliance expert. Analyze the following text for potential regulatory risks.
+        You are a financial compliance expert specializing in ${context}.
+        
+        Carefully analyze the following text for potential regulatory risks and compliance issues.
+
+        Context of Review: ${context}
 
         Strictly return a JSON response with this exact structure:
         {
@@ -38,14 +46,16 @@ export const analyzeText = async (req: Request, res: Response) => {
           "remediation_steps": [
             "specific remediation step 1",
             "specific remediation step 2"
-          ]
+          ],
+          "context_specific_notes": "Additional insights specific to the given context"
         }
 
         If you cannot identify risks, return:
         {
           "risk_level": "low",
           "key_risks": [],
-          "remediation_steps": []
+          "remediation_steps": [],
+          "context_specific_notes": "No significant risks identified"
         }
 
         Text to analyze:

@@ -21,19 +21,69 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     }
 
     // Validate and clean file URL
-    const cleanedFileUrl = decodeURIComponent(fileUrl);
+    const cleanedFileUrl = decodeURIComponent(fileUrl)
+      .replace(/^documents\//, '')  // Remove 'documents/' prefix if present
+      .trim();
     console.log('Cleaned File URL:', cleanedFileUrl);
 
     // Download file from storage
     let fileData;
     try {
+      console.log('Supabase Storage Download Attempt:', {
+        bucket: 'documents',
+        path: cleanedFileUrl,
+        url: supabase.storage.from('documents').getPublicUrl(cleanedFileUrl)
+      });
+
+      // First, check if file exists
+      const folderPath = cleanedFileUrl.split('/').slice(0, -1).join('/');
+      const fileName = cleanedFileUrl.split('/').pop();
+      
+      console.log('Checking file existence:', {
+        folderPath,
+        fileName
+      });
+
+      const { data: listData, error: listError } = await supabase
+        .storage
+        .from('documents')
+        .list(folderPath, {
+          limit: 100,
+          offset: 0,
+          sortBy: { column: 'name', order: 'asc' },
+        });
+
+      console.log('Storage List Result:', {
+        files: listData?.map(file => file.name),
+        error: listError
+      });
+
+      // Check if the specific file exists in the list
+      const fileExists = listData?.some(file => file.name === fileName);
+      
+      if (!fileExists) {
+        console.error('File not found in storage', {
+          path: cleanedFileUrl,
+          existingFiles: listData?.map(file => file.name)
+        });
+        return res.status(404).json({ 
+          error: 'Document not found', 
+          details: `No file found at path: ${cleanedFileUrl}` 
+        });
+      }
+
       const { data, error: fileError } = await supabase
         .storage
         .from('documents')
         .download(cleanedFileUrl);
 
       if (fileError) {
-        console.error('Supabase storage download error:', fileError);
+        console.error('Detailed Supabase storage download error:', {
+          error: fileError,
+          errorType: typeof fileError,
+          errorKeys: Object.keys(fileError || {}),
+          stringifiedError: JSON.stringify(fileError)
+        });
         return res.status(400).json({ 
           error: 'Failed to download document', 
           details: fileError instanceof Error 
@@ -44,7 +94,11 @@ export const analyzeDocument = async (req: Request, res: Response) => {
 
       fileData = data;
     } catch (downloadError) {
-      console.error('Unexpected download error:', downloadError);
+      console.error('Unexpected download error:', {
+        error: downloadError,
+        errorType: typeof downloadError,
+        stringifiedError: JSON.stringify(downloadError)
+      });
       return res.status(500).json({ 
         error: 'Unexpected error downloading document', 
         details: downloadError instanceof Error 

@@ -127,12 +127,28 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     let result;
     try {
       result = await visionModel.generateContent(`
-        Analyze this document for potential compliance risks. 
-        Provide a JSON response with these keys:
-        - risk_level (string: 'low', 'medium', 'high')
-        - key_risks (array of strings)
-        - remediation_steps (array of strings)
-        
+        You are a financial document compliance expert. Analyze the attached document for potential regulatory risks.
+
+        Strictly return a JSON response with this exact structure:
+        {
+          "risk_level": "low|medium|high",
+          "key_risks": [
+            "specific risk description 1",
+            "specific risk description 2"
+          ],
+          "remediation_steps": [
+            "specific remediation step 1",
+            "specific remediation step 2"
+          ]
+        }
+
+        If you cannot parse the document or find no risks, return:
+        {
+          "risk_level": "low",
+          "key_risks": [],
+          "remediation_steps": []
+        }
+
         Document content:
         ${fileContent}
       `);
@@ -169,14 +185,23 @@ export const analyzeDocument = async (req: Request, res: Response) => {
         throw new Error('Empty response text from Gemini');
       }
 
-      console.log('Raw Response Text:', responseText);
+      console.log('Raw Gemini Response:', responseText);
+
+      // Extract JSON from code block if present
+      const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/);
+      const cleanedResponseText = jsonMatch 
+        ? jsonMatch[1] 
+        : responseText.trim();
 
       // Safely parse the response text
       let findings;
       try {
-        findings = JSON.parse(responseText);
+        findings = JSON.parse(cleanedResponseText);
       } catch (parseError) {
-        console.error('Failed to parse response text:', parseError);
+        console.error('Failed to parse response text:', {
+          responseText: cleanedResponseText,
+          parseError
+        });
         throw new Error('Invalid JSON response from Gemini');
       }
 
@@ -208,7 +233,7 @@ export const analyzeDocument = async (req: Request, res: Response) => {
 
     } catch (parseError: unknown) {
       console.error('Parsing Error:', parseError);
-      console.error('Raw Response Text:', responseText);
+      console.error('Raw Gemini Response:', responseText);
       
       return res.status(400).json({ 
         error: 'Failed to parse analysis results', 

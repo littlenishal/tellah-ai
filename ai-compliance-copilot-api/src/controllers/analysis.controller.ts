@@ -11,16 +11,38 @@ export const analyzeDocument = async (req: Request, res: Response) => {
       ? file_url.replace('documents/', '') 
       : file_url;
 
+    console.log('Attempting to download file:', cleanedFileUrl);
+
     // Get file from Supabase storage
     const { data: fileData, error: fileError } = await supabase
       .storage
       .from('documents')
       .download(cleanedFileUrl);
 
-    if (fileError) throw fileError;
+    if (fileError) {
+      console.error('Supabase storage download error:', fileError);
+      return res.status(400).json({ 
+        error: 'Failed to analyze document', 
+        details: fileError instanceof Error ? fileError.message : String(fileError)
+      });
+    }
 
     // Convert file to text (simplified for MVP)
-    const text = await fileData.text();
+    let text;
+    try {
+      text = await fileData.text();
+      console.log('File converted to text successfully');
+    } catch (textError: unknown) {
+      console.error('Text conversion error:', textError);
+      
+      // Type guard to handle the unknown error
+      const errorMessage = textError instanceof Error ? textError.message : String(textError);
+      
+      return res.status(400).json({ 
+        error: 'Failed to convert document to text', 
+        details: errorMessage 
+      });
+    }
 
     // Analyze with Gemini
     const result = await model.generateContent(`
@@ -39,8 +61,22 @@ export const analyzeDocument = async (req: Request, res: Response) => {
       - remediation_steps
     `);
 
+    console.log('Gemini analysis initiated');
+
     const response = await result.response;
-    const findings = JSON.parse(response.text());
+    console.log('Gemini response received');
+
+    let findings;
+    try {
+      findings = JSON.parse(response.text());
+      console.log('Findings parsed successfully');
+    } catch (parseError: unknown) {
+      console.error('JSON parsing error:', parseError);
+      return res.status(400).json({ 
+        error: 'Failed to parse analysis results', 
+        details: parseError instanceof Error ? parseError.message : String(parseError)
+      });
+    }
 
     // Store message and findings
     const { data: message, error: messageError } = await supabase
@@ -69,9 +105,10 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     if (findingsError) throw findingsError;
 
     res.json({ message_id: message.id, findings });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Analysis error:', error);
-    res.status(500).json({ error: 'Failed to analyze document' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ error: 'Failed to analyze document', details: errorMessage });
   }
 };
 
@@ -86,7 +123,9 @@ export const getFindings = async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch findings' });
+  } catch (error: unknown) {
+    console.error('Error fetching findings:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ error: 'Failed to fetch findings', details: errorMessage });
   }
 };

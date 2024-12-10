@@ -127,7 +127,7 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     let result;
     try {
       result = await visionModel.generateContent(`
-        You are a financial document compliance expert. Analyze the attached document for potential regulatory risks.
+        You are a financial document compliance expert. Analyze the attached document using OCR and natural language processing to identify potential regulatory risks.
 
         Strictly return a JSON response with this exact structure:
         {

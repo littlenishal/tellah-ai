@@ -23,6 +23,8 @@ export const analyzeText = async (req: Request, res: Response) => {
     // Gemini analysis
     let result;
     try {
+      console.log('Gemini Model Used:', model.model);
+      
       result = await model.generateContent(`
         You are a financial document compliance expert. Analyze the following text for potential regulatory risks.
 
@@ -50,7 +52,14 @@ export const analyzeText = async (req: Request, res: Response) => {
         ${text}
       `);
     } catch (geminiError) {
-      console.error('Gemini API call error:', geminiError);
+      console.error('Detailed Gemini API call error:', {
+        error: geminiError,
+        errorType: typeof geminiError,
+        errorName: geminiError instanceof Error ? geminiError.name : 'Unknown',
+        errorMessage: geminiError instanceof Error ? geminiError.message : JSON.stringify(geminiError),
+        errorStack: geminiError instanceof Error ? geminiError.stack : 'No stack trace',
+        modelUsed: model.model
+      });
       return res.status(500).json({ 
         error: 'Failed to analyze text with AI', 
         details: geminiError instanceof Error 

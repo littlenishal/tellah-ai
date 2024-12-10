@@ -60,6 +60,21 @@ export const authController = {
         });
       }
 
+      // Create a folder in Supabase storage for the user's documents
+      const userFolderPath = `${data.user.id}/`;
+      const { error: folderError } = await supabase
+        .storage
+        .from('documents')
+        .upload(userFolderPath + '.keep', new Uint8Array(), {
+          contentType: 'text/plain',
+          upsert: true
+        });
+
+      if (folderError) {
+        console.error('User documents folder creation error:', folderError);
+        // Note: We don't return an error here to prevent blocking user signup
+      }
+
       // Return user details (excluding sensitive information)
       res.status(201).json({ 
         user: {

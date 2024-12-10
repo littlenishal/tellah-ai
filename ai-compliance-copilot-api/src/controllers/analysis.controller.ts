@@ -6,11 +6,16 @@ export const analyzeDocument = async (req: Request, res: Response) => {
   try {
     const { file_url, conversation_id } = req.body;
 
+    // Remove 'documents/' prefix if present
+    const cleanedFileUrl = file_url.startsWith('documents/') 
+      ? file_url.replace('documents/', '') 
+      : file_url;
+
     // Get file from Supabase storage
     const { data: fileData, error: fileError } = await supabase
       .storage
       .from('documents')
-      .download(file_url);
+      .download(cleanedFileUrl);
 
     if (fileError) throw fileError;
 
@@ -42,7 +47,7 @@ export const analyzeDocument = async (req: Request, res: Response) => {
       .from('messages')
       .insert([{
         conversation_id,
-        file_url,
+        file_url: cleanedFileUrl,
         is_ai_response: true,
         content: 'Document Analysis Results'
       }])

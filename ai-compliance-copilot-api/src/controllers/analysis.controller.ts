@@ -64,19 +64,34 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     console.log('Gemini response received:', response);
     
     // More robust response handling
-    let responseText;
+    let responseText: string = '';
     try {
       // Check if response has a text method
       if (typeof response.text === 'function') {
-        responseText = response.text();
+        const extractedText = response.text();
+        if (typeof extractedText === 'string') {
+          responseText = extractedText;
+        } else {
+          throw new Error('Extracted text is not a string');
+        }
       } else if (response.candidates && response.candidates[0]) {
         // Alternative parsing for Gemini response
-        responseText = response.candidates[0].content.parts[0].text;
+        const candidateText = response.candidates[0]?.content?.parts?.[0]?.text;
+        if (typeof candidateText === 'string') {
+          responseText = candidateText;
+        } else {
+          throw new Error('Unable to extract text from candidates');
+        }
       } else {
         throw new Error('Unable to extract text from response');
       }
 
       console.log('Raw Response Text:', responseText);
+
+      // Ensure responseText is not empty
+      if (!responseText.trim()) {
+        throw new Error('Response text is empty');
+      }
 
       // Attempt to parse the response text
       const findings = JSON.parse(responseText);

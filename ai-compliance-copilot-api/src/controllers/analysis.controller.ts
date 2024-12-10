@@ -64,17 +64,29 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     console.log('Gemini analysis initiated');
 
     const response = await result.response;
-    console.log('Gemini response received');
+    console.log('Gemini response received:', response);
+    console.log('Response type:', typeof response);
+    console.log('Response keys:', Object.keys(response));
+    console.log('Response text method exists:', typeof response.text === 'function');
 
     let findings;
     try {
-      findings = JSON.parse(response.text());
-      console.log('Findings parsed successfully');
+      // Add more robust parsing
+      const responseText = response.text ? response.text() : JSON.stringify(response);
+      console.log('Raw response text:', responseText);
+      
+      findings = JSON.parse(responseText);
+      console.log('Findings parsed successfully:', findings);
     } catch (parseError: unknown) {
       console.error('JSON parsing error:', parseError);
+      console.error('Full response object:', response);
       return res.status(400).json({ 
         error: 'Failed to parse analysis results', 
-        details: parseError instanceof Error ? parseError.message : String(parseError)
+        details: parseError instanceof Error 
+          ? parseError.message 
+          : (typeof parseError === 'object' 
+             ? JSON.stringify(parseError) 
+             : String(parseError))
       });
     }
 

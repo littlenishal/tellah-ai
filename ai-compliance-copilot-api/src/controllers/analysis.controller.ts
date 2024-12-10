@@ -4,16 +4,28 @@ import { model, visionModel } from '../config/gemini';
 
 export const analyzeDocument = async (req: Request, res: Response) => {
   try {
-    const { file_url, conversation_id } = req.body;
+    console.log('Analyze Document Request:', {
+      body: req.body,
+      query: req.query,
+      params: req.params,
+      headers: req.headers
+    });
 
-    // Remove 'documents/' prefix if present
-    const cleanedFileUrl = file_url.startsWith('documents/') 
-      ? file_url.replace('documents/', '') 
-      : file_url;
+    const { file_url: fileUrl, conversation_id } = req.body;
+    
+    if (!fileUrl) {
+      console.error('Missing file URL');
+      return res.status(400).json({ 
+        error: 'Missing file URL', 
+        details: 'File URL is required in the request body' 
+      });
+    }
 
-    console.log('Attempting to download file:', cleanedFileUrl);
+    // Validate and clean file URL
+    const cleanedFileUrl = decodeURIComponent(fileUrl);
+    console.log('Cleaned File URL:', cleanedFileUrl);
 
-    // Get file from Supabase storage
+    // Download file from storage
     const { data: fileData, error: fileError } = await supabase
       .storage
       .from('documents')
@@ -23,63 +35,81 @@ export const analyzeDocument = async (req: Request, res: Response) => {
       console.error('Supabase storage download error:', fileError);
       return res.status(400).json({ 
         error: 'Failed to analyze document', 
-        details: fileError instanceof Error ? fileError.message : String(fileError)
+        details: fileError instanceof Error 
+          ? fileError.message 
+          : JSON.stringify(fileError)
       });
     }
 
-    // Convert file to text (simplified for MVP)
-    let text;
-    try {
-      text = await fileData.text();
-      console.log('File converted to text successfully');
-    } catch (textError: unknown) {
-      console.error('Text conversion error:', textError);
-      
-      // Type guard to handle the unknown error
-      const errorMessage = textError instanceof Error ? textError.message : String(textError);
-      
-      return res.status(400).json({ 
-        error: 'Failed to convert document to text', 
-        details: errorMessage 
-      });
-    }
+    // Read file content
+    const fileContent = await fileData.text();
+    console.log('File Content Length:', fileContent.length);
+    console.log('First 500 chars:', fileContent.slice(0, 500));
 
-    // Analyze with Gemini
-    const result = await model.generateContent(`
-      Analyze this document for regulatory compliance issues:
-      ${text}
+    // Gemini analysis
+    const result = await visionModel.generateContent(`
+      Analyze this document for potential compliance risks. 
+      Provide a JSON response with these keys:
+      - risk_level (string: 'low', 'medium', 'high')
+      - key_risks (array of strings)
+      - remediation_steps (array of strings)
       
-      Focus on:
-      1. Truth in Lending Act (TILA)
-      2. Equal Credit Opportunity Act (ECOA)
-      3. Unfair, Deceptive, or Abusive Acts or Practices (UDAAP)
-      
-      Format the response as JSON with:
-      - regulation_reference
-      - severity (Critical, High, Medium, Low)
-      - finding_details
-      - remediation_steps
+      Document content:
+      ${fileContent}
     `);
 
     console.log('Gemini analysis initiated');
 
     const response = await result.response;
     console.log('Gemini response received:', response);
-    console.log('Response type:', typeof response);
-    console.log('Response keys:', Object.keys(response));
-    console.log('Response text method exists:', typeof response.text === 'function');
-
-    let findings;
+    
+    // More robust response handling
+    let responseText;
     try {
-      // Add more robust parsing
-      const responseText = response.text ? response.text() : JSON.stringify(response);
-      console.log('Raw response text:', responseText);
-      
-      findings = JSON.parse(responseText);
-      console.log('Findings parsed successfully:', findings);
+      // Check if response has a text method
+      if (typeof response.text === 'function') {
+        responseText = response.text();
+      } else if (response.candidates && response.candidates[0]) {
+        // Alternative parsing for Gemini response
+        responseText = response.candidates[0].content.parts[0].text;
+      } else {
+        throw new Error('Unable to extract text from response');
+      }
+
+      console.log('Raw Response Text:', responseText);
+
+      // Attempt to parse the response text
+      const findings = JSON.parse(responseText);
+      console.log('Parsed Findings:', findings);
+
+      // Store message and findings
+      const { data: message, error: messageError } = await supabase
+        .from('messages')
+        .insert([{
+          conversation_id,
+          file_url: cleanedFileUrl,
+          is_ai_response: true,
+          content: JSON.stringify(findings)
+        }])
+        .select()
+        .single();
+
+      if (messageError) {
+        console.error('Supabase message insert error:', messageError);
+        return res.status(500).json({ 
+          error: 'Failed to store analysis', 
+          details: messageError instanceof Error 
+            ? messageError.message 
+            : JSON.stringify(messageError)
+        });
+      }
+
+      res.json({ message_id: message.id, findings });
+
     } catch (parseError: unknown) {
-      console.error('JSON parsing error:', parseError);
-      console.error('Full response object:', response);
+      console.error('Parsing Error:', parseError);
+      console.error('Response Text that Failed to Parse:', responseText);
+      
       return res.status(400).json({ 
         error: 'Failed to parse analysis results', 
         details: parseError instanceof Error 
@@ -89,38 +119,17 @@ export const analyzeDocument = async (req: Request, res: Response) => {
              : String(parseError))
       });
     }
-
-    // Store message and findings
-    const { data: message, error: messageError } = await supabase
-      .from('messages')
-      .insert([{
-        conversation_id,
-        file_url: cleanedFileUrl,
-        is_ai_response: true,
-        content: 'Document Analysis Results'
-      }])
-      .select()
-      .single();
-
-    if (messageError) throw messageError;
-
-    // Store findings
-    const { error: findingsError } = await supabase
-      .from('compliance_findings')
-      .insert(
-        findings.map((finding: any) => ({
-          message_id: message.id,
-          ...finding
-        }))
-      );
-
-    if (findingsError) throw findingsError;
-
-    res.json({ message_id: message.id, findings });
   } catch (error: unknown) {
-    console.error('Analysis error:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    res.status(500).json({ error: 'Failed to analyze document', details: errorMessage });
+    console.error('Unexpected Error in Document Analysis:', error);
+    
+    res.status(500).json({ 
+      error: 'Unexpected error during document analysis', 
+      details: error instanceof Error 
+        ? error.message 
+        : (typeof error === 'object' 
+           ? JSON.stringify(error) 
+           : String(error))
+    });
   }
 };
 

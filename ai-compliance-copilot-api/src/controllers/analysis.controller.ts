@@ -23,9 +23,9 @@ export const analyzeDocument = async (req: Request, res: Response) => {
       ${text}
       
       Focus on:
-      1. PCI DSS requirements
-      2. GDPR compliance
-      3. AML regulations
+      1. Truth in Lending Act (TILA)
+      2. Equal Credit Opportunity Act (ECOA)
+      3. Unfair, Deceptive, or Abusive Acts or Practices (UDAAP)
       
       Format the response as JSON with:
       - regulation_reference

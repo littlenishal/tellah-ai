@@ -2,132 +2,29 @@ import { Request, Response } from 'express';
 import { supabase } from '../config/supabase';
 import { model, visionModel } from '../config/gemini';
 
-export const analyzeDocument = async (req: Request, res: Response) => {
+export const analyzeText = async (req: Request, res: Response) => {
   try {
-    console.log('Analyze Document Request:', {
+    console.log('Analyze Text Request:', {
       body: req.body,
       query: req.query,
       params: req.params
     });
 
-    const { file_url: fileUrl, conversation_id } = req.body;
+    const { text, conversation_id } = req.body;
     
-    if (!fileUrl) {
-      console.error('Missing file URL');
+    if (!text) {
+      console.error('Missing text content');
       return res.status(400).json({ 
-        error: 'Missing file URL', 
-        details: 'File URL is required in the request body' 
-      });
-    }
-
-    // Validate and clean file URL
-    const cleanedFileUrl = decodeURIComponent(fileUrl)
-      .replace(/^documents\//, '')  // Remove 'documents/' prefix if present
-      .trim();
-    console.log('Cleaned File URL:', cleanedFileUrl);
-
-    // Download file from storage
-    let fileData;
-    try {
-      console.log('Supabase Storage Download Attempt:', {
-        bucket: 'documents',
-        path: cleanedFileUrl,
-        url: supabase.storage.from('documents').getPublicUrl(cleanedFileUrl)
-      });
-
-      // First, check if file exists
-      const folderPath = cleanedFileUrl.split('/').slice(0, -1).join('/');
-      const fileName = cleanedFileUrl.split('/').pop();
-      
-      console.log('Checking file existence:', {
-        folderPath,
-        fileName
-      });
-
-      const { data: listData, error: listError } = await supabase
-        .storage
-        .from('documents')
-        .list(folderPath, {
-          limit: 100,
-          offset: 0,
-          sortBy: { column: 'name', order: 'asc' },
-        });
-
-      console.log('Storage List Result:', {
-        files: listData?.map(file => file.name),
-        error: listError
-      });
-
-      // Check if the specific file exists in the list
-      const fileExists = listData?.some(file => file.name === fileName);
-      
-      if (!fileExists) {
-        console.error('File not found in storage', {
-          path: cleanedFileUrl,
-          existingFiles: listData?.map(file => file.name)
-        });
-        return res.status(404).json({ 
-          error: 'Document not found', 
-          details: `No file found at path: ${cleanedFileUrl}` 
-        });
-      }
-
-      const { data, error: fileError } = await supabase
-        .storage
-        .from('documents')
-        .download(cleanedFileUrl);
-
-      if (fileError) {
-        console.error('Detailed Supabase storage download error:', {
-          error: fileError,
-          errorType: typeof fileError,
-          errorKeys: Object.keys(fileError || {}),
-          stringifiedError: JSON.stringify(fileError)
-        });
-        return res.status(400).json({ 
-          error: 'Failed to download document', 
-          details: fileError instanceof Error 
-            ? fileError.message 
-            : JSON.stringify(fileError)
-        });
-      }
-
-      fileData = data;
-    } catch (downloadError) {
-      console.error('Unexpected download error:', {
-        error: downloadError,
-        errorType: typeof downloadError,
-        stringifiedError: JSON.stringify(downloadError)
-      });
-      return res.status(500).json({ 
-        error: 'Unexpected error downloading document', 
-        details: downloadError instanceof Error 
-          ? downloadError.message 
-          : JSON.stringify(downloadError)
-      });
-    }
-
-    // Read file content
-    let fileContent: string;
-    try {
-      fileContent = await fileData.text();
-      console.log('File Content Length:', fileContent.length);
-      console.log('First 500 chars:', fileContent.slice(0, 500));
-    } catch (textError) {
-      console.error('File to text conversion error:', textError);
-      return res.status(400).json({ 
-        error: 'Failed to convert document to text', 
-        details: textError instanceof Error 
-          ? textError.message 
-          : JSON.stringify(textError)
+        error: 'Missing text content', 
+        details: 'Text content is required in the request body' 
       });
     }
 
     // Gemini analysis
     let result;
     try {
-      result = await visionModel.generateContent(`
-        You are a financial document compliance expert. Analyze the attached document using OCR and natural language processing to identify potential regulatory risks.
+      result = await model.generateContent(`
+        You are a financial document compliance expert. Analyze the following text for potential regulatory risks.
 
         Strictly return a JSON response with this exact structure:
         {
@@ -142,20 +39,20 @@ export const analyzeDocument = async (req: Request, res: Response) => {
           ]
         }
 
-        If you cannot parse the document or find no risks, return:
+        If you cannot identify risks, return:
         {
           "risk_level": "low",
           "key_risks": [],
           "remediation_steps": []
         }
 
-        Document content:
-        ${fileContent}
+        Text to analyze:
+        ${text}
       `);
     } catch (geminiError) {
       console.error('Gemini API call error:', geminiError);
       return res.status(500).json({ 
-        error: 'Failed to analyze document with AI', 
+        error: 'Failed to analyze text with AI', 
         details: geminiError instanceof Error 
           ? geminiError.message 
           : JSON.stringify(geminiError)
@@ -212,7 +109,6 @@ export const analyzeDocument = async (req: Request, res: Response) => {
         .from('messages')
         .insert([{
           conversation_id,
-          file_url: cleanedFileUrl,
           is_ai_response: true,
           content: JSON.stringify(findings)
         }])
@@ -245,10 +141,10 @@ export const analyzeDocument = async (req: Request, res: Response) => {
       });
     }
   } catch (error: unknown) {
-    console.error('Unexpected Error in Document Analysis:', error);
+    console.error('Unexpected Error in Text Analysis:', error);
     
     res.status(500).json({ 
-      error: 'Unexpected error during document analysis', 
+      error: 'Unexpected error during text analysis', 
       details: error instanceof Error 
         ? error.message 
         : (typeof error === 'object' 

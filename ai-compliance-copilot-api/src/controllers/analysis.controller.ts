@@ -7,8 +7,7 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     console.log('Analyze Document Request:', {
       body: req.body,
       query: req.query,
-      params: req.params,
-      headers: req.headers
+      params: req.params
     });
 
     const { file_url: fileUrl, conversation_id } = req.body;
@@ -26,75 +25,107 @@ export const analyzeDocument = async (req: Request, res: Response) => {
     console.log('Cleaned File URL:', cleanedFileUrl);
 
     // Download file from storage
-    const { data: fileData, error: fileError } = await supabase
-      .storage
-      .from('documents')
-      .download(cleanedFileUrl);
+    let fileData;
+    try {
+      const { data, error: fileError } = await supabase
+        .storage
+        .from('documents')
+        .download(cleanedFileUrl);
 
-    if (fileError) {
-      console.error('Supabase storage download error:', fileError);
-      return res.status(400).json({ 
-        error: 'Failed to analyze document', 
-        details: fileError instanceof Error 
-          ? fileError.message 
-          : JSON.stringify(fileError)
+      if (fileError) {
+        console.error('Supabase storage download error:', fileError);
+        return res.status(400).json({ 
+          error: 'Failed to download document', 
+          details: fileError instanceof Error 
+            ? fileError.message 
+            : JSON.stringify(fileError)
+        });
+      }
+
+      fileData = data;
+    } catch (downloadError) {
+      console.error('Unexpected download error:', downloadError);
+      return res.status(500).json({ 
+        error: 'Unexpected error downloading document', 
+        details: downloadError instanceof Error 
+          ? downloadError.message 
+          : JSON.stringify(downloadError)
       });
     }
 
     // Read file content
-    const fileContent = await fileData.text();
-    console.log('File Content Length:', fileContent.length);
-    console.log('First 500 chars:', fileContent.slice(0, 500));
+    let fileContent: string;
+    try {
+      fileContent = await fileData.text();
+      console.log('File Content Length:', fileContent.length);
+      console.log('First 500 chars:', fileContent.slice(0, 500));
+    } catch (textError) {
+      console.error('File to text conversion error:', textError);
+      return res.status(400).json({ 
+        error: 'Failed to convert document to text', 
+        details: textError instanceof Error 
+          ? textError.message 
+          : JSON.stringify(textError)
+      });
+    }
 
     // Gemini analysis
-    const result = await visionModel.generateContent(`
-      Analyze this document for potential compliance risks. 
-      Provide a JSON response with these keys:
-      - risk_level (string: 'low', 'medium', 'high')
-      - key_risks (array of strings)
-      - remediation_steps (array of strings)
-      
-      Document content:
-      ${fileContent}
-    `);
+    let result;
+    try {
+      result = await visionModel.generateContent(`
+        Analyze this document for potential compliance risks. 
+        Provide a JSON response with these keys:
+        - risk_level (string: 'low', 'medium', 'high')
+        - key_risks (array of strings)
+        - remediation_steps (array of strings)
+        
+        Document content:
+        ${fileContent}
+      `);
+    } catch (geminiError) {
+      console.error('Gemini API call error:', geminiError);
+      return res.status(500).json({ 
+        error: 'Failed to analyze document with AI', 
+        details: geminiError instanceof Error 
+          ? geminiError.message 
+          : JSON.stringify(geminiError)
+      });
+    }
 
-    console.log('Gemini analysis initiated');
-
-    const response = await result.response;
-    console.log('Gemini response received:', response);
-    
-    // More robust response handling
+    // Process Gemini response
     let responseText: string = '';
     try {
-      // Check if response has a text method
-      if (typeof response.text === 'function') {
-        const extractedText = response.text();
-        if (typeof extractedText === 'string') {
-          responseText = extractedText;
-        } else {
-          throw new Error('Extracted text is not a string');
-        }
-      } else if (response.candidates && response.candidates[0]) {
-        // Alternative parsing for Gemini response
-        const candidateText = response.candidates[0]?.content?.parts?.[0]?.text;
-        if (typeof candidateText === 'string') {
-          responseText = candidateText;
-        } else {
-          throw new Error('Unable to extract text from candidates');
-        }
-      } else {
-        throw new Error('Unable to extract text from response');
+      // Attempt to extract text from response
+      const candidates = result.response.candidates;
+      
+      if (!candidates || candidates.length === 0) {
+        throw new Error('No candidates in Gemini response');
+      }
+
+      const firstCandidate = candidates[0];
+      const parts = firstCandidate.content?.parts;
+      
+      if (!parts || parts.length === 0) {
+        throw new Error('No parts in Gemini response candidate');
+      }
+
+      responseText = parts[0].text || '';
+
+      if (!responseText) {
+        throw new Error('Empty response text from Gemini');
       }
 
       console.log('Raw Response Text:', responseText);
 
-      // Ensure responseText is not empty
-      if (!responseText.trim()) {
-        throw new Error('Response text is empty');
+      // Safely parse the response text
+      let findings;
+      try {
+        findings = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response text:', parseError);
+        throw new Error('Invalid JSON response from Gemini');
       }
 
-      // Attempt to parse the response text
-      const findings = JSON.parse(responseText);
       console.log('Parsed Findings:', findings);
 
       // Store message and findings
@@ -123,7 +154,7 @@ export const analyzeDocument = async (req: Request, res: Response) => {
 
     } catch (parseError: unknown) {
       console.error('Parsing Error:', parseError);
-      console.error('Response Text that Failed to Parse:', responseText);
+      console.error('Raw Response Text:', responseText);
       
       return res.status(400).json({ 
         error: 'Failed to parse analysis results', 

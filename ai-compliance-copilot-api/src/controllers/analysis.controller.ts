@@ -36,6 +36,13 @@ export const analyzeText = async (req: Request, res: Response) => {
 
         Context of Review: ${context}
 
+        IMPORTANT INSTRUCTIONS:
+        1. ALWAYS return a valid JSON response
+        2. Ensure the JSON is properly formatted
+        3. Use double quotes for strings
+        4. Do not use single quotes
+        5. Escape any special characters in strings
+
         Strictly return a JSON response with this exact structure:
         {
           "risk_level": "low|medium|high",
@@ -103,11 +110,20 @@ export const analyzeText = async (req: Request, res: Response) => {
 
       console.log('Raw Gemini Response:', responseText);
 
-      // Extract JSON from code block if present
+      // Extract JSON from code block or text
       const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/);
-      const cleanedResponseText = jsonMatch 
-        ? jsonMatch[1] 
-        : responseText.trim();
+      const jsonTextMatch = responseText.match(/\{[\s\S]*?\}/);
+      
+      let cleanedResponseText = '';
+      if (jsonMatch) {
+        cleanedResponseText = jsonMatch[1].trim();
+      } else if (jsonTextMatch) {
+        cleanedResponseText = jsonTextMatch[0].trim();
+      } else {
+        cleanedResponseText = responseText.trim();
+      }
+
+      console.log('Cleaned Response Text:', cleanedResponseText);
 
       // Safely parse the response text
       let findings;
@@ -116,9 +132,26 @@ export const analyzeText = async (req: Request, res: Response) => {
       } catch (parseError) {
         console.error('Failed to parse response text:', {
           responseText: cleanedResponseText,
-          parseError
+          parseError,
+          responseLength: cleanedResponseText.length
         });
-        throw new Error('Invalid JSON response from Gemini');
+        
+        // Additional parsing attempts
+        try {
+          // Try to fix common JSON parsing issues
+          const fixedResponseText = cleanedResponseText
+            .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2":')  // Add quotes to keys
+            .replace(/'/g, '"');  // Replace single quotes with double quotes
+          
+          findings = JSON.parse(fixedResponseText);
+        } catch (secondParseError) {
+          console.error('Secondary parsing attempt failed:', {
+            secondParseError,
+            originalText: cleanedResponseText
+          });
+          
+          throw new Error('Invalid JSON response from Gemini');
+        }
       }
 
       console.log('Parsed Findings:', findings);

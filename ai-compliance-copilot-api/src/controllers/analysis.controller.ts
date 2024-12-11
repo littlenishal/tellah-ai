@@ -210,12 +210,19 @@ export const getFindings = async (req: Request, res: Response) => {
   try {
     const { messageId } = req.params;
 
-    // First, get the message to ensure it exists
+    console.log('Fetching findings for messageId:', messageId);
+
+    // First, verify the message exists and get its details
     const { data: messageData, error: messageError } = await supabase
       .from('messages')
-      .select('content')
+      .select('*')
       .eq('id', messageId)
       .single();
+
+    console.log('Message Query Result:', {
+      messageData,
+      messageError
+    });
 
     if (messageError) {
       return res.status(404).json({ 
@@ -224,11 +231,36 @@ export const getFindings = async (req: Request, res: Response) => {
       });
     }
 
-    // Then, get the compliance findings
+    // Check if the findings might be stored in the message content itself
+    if (messageData.content) {
+      try {
+        const parsedContent = typeof messageData.content === 'string' 
+          ? JSON.parse(messageData.content) 
+          : messageData.content;
+
+        // Check if the parsed content has findings-like structure
+        if (parsedContent.risk_level || parsedContent.key_risks) {
+          return res.json({
+            findings: parsedContent,
+            message_id: messageId,
+            created_at: messageData.created_at
+          });
+        }
+      } catch (parseError) {
+        console.error('Error parsing message content:', parseError);
+      }
+    }
+
+    // Then, try to get compliance findings
     const { data: findingsData, error } = await supabase
       .from('compliance_findings')
       .select('*')
       .eq('message_id', messageId);
+
+    console.log('Findings Query Result:', {
+      findingsData,
+      error
+    });
 
     if (error) {
       return res.status(500).json({ 
@@ -237,11 +269,36 @@ export const getFindings = async (req: Request, res: Response) => {
       });
     }
 
-    // If no findings found, return appropriate response
+    // If no findings found in compliance_findings, check message content again
     if (!findingsData || findingsData.length === 0) {
+      console.warn(`No findings found for message ${messageId}. Checking message content.`);
+      
+      // Fallback to returning message content if it seems like findings
+      if (messageData.content) {
+        try {
+          const parsedContent = typeof messageData.content === 'string' 
+            ? JSON.parse(messageData.content) 
+            : messageData.content;
+
+          if (parsedContent.risk_level || parsedContent.key_risks) {
+            return res.json({
+              findings: parsedContent,
+              message_id: messageId,
+              created_at: messageData.created_at
+            });
+          }
+        } catch (parseError) {
+          console.error('Error parsing message content as findings:', parseError);
+        }
+      }
+
       return res.status(404).json({ 
         error: 'No findings available', 
-        details: `No compliance findings found for message ${messageId}` 
+        details: `No compliance findings found for message ${messageId}`,
+        debug: {
+          messageData,
+          findingsData
+        }
       });
     }
 

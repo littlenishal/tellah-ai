@@ -228,34 +228,50 @@ export const getFindings = async (req: Request, res: Response) => {
     const { data: findingsData, error } = await supabase
       .from('compliance_findings')
       .select('*')
-      .eq('message_id', messageId)
-      .single();
+      .eq('message_id', messageId);
 
     if (error) {
-      return res.status(404).json({ 
-        error: 'Findings not found', 
+      return res.status(500).json({ 
+        error: 'Failed to fetch findings', 
         details: error.message 
       });
     }
 
-    // Parse the findings content if it's a string
-    let parsedFindings;
-    try {
-      parsedFindings = typeof findingsData.content === 'string' 
-        ? JSON.parse(findingsData.content) 
-        : findingsData.content;
-    } catch (parseError) {
-      return res.status(500).json({ 
-        error: 'Failed to parse findings', 
-        details: 'Invalid findings format' 
+    // If no findings found, return appropriate response
+    if (!findingsData || findingsData.length === 0) {
+      return res.status(404).json({ 
+        error: 'No findings available', 
+        details: `No compliance findings found for message ${messageId}` 
       });
     }
 
-    res.json({
-      findings: parsedFindings,
-      message_id: messageId,
-      created_at: findingsData.created_at
-    });
+    // If multiple findings exist, return all of them
+    const parsedFindings = findingsData.map(finding => {
+      try {
+        return {
+          findings: typeof finding.content === 'string' 
+            ? JSON.parse(finding.content) 
+            : finding.content,
+          message_id: messageId,
+          created_at: finding.created_at,
+          id: finding.id
+        };
+      } catch (parseError) {
+        console.error(`Failed to parse finding ${finding.id}:`, parseError);
+        return null;
+      }
+    }).filter(finding => finding !== null);
+
+    // If no valid findings after parsing
+    if (parsedFindings.length === 0) {
+      return res.status(500).json({ 
+        error: 'Invalid findings format', 
+        details: 'Unable to parse any findings' 
+      });
+    }
+
+    // Return findings
+    res.json(parsedFindings.length === 1 ? parsedFindings[0] : parsedFindings);
   } catch (error: unknown) {
     console.error('Error fetching findings:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);

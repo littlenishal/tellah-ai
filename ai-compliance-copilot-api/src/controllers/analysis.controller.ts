@@ -210,16 +210,58 @@ export const getFindings = async (req: Request, res: Response) => {
   try {
     const { messageId } = req.params;
 
-    const { data, error } = await supabase
+    // First, get the message to ensure it exists
+    const { data: messageData, error: messageError } = await supabase
+      .from('messages')
+      .select('content')
+      .eq('id', messageId)
+      .single();
+
+    if (messageError) {
+      return res.status(404).json({ 
+        error: 'Message not found', 
+        details: messageError.message 
+      });
+    }
+
+    // Then, get the compliance findings
+    const { data: findingsData, error } = await supabase
       .from('compliance_findings')
       .select('*')
-      .eq('message_id', messageId);
+      .eq('message_id', messageId)
+      .single();
 
-    if (error) throw error;
-    res.json(data);
+    if (error) {
+      return res.status(404).json({ 
+        error: 'Findings not found', 
+        details: error.message 
+      });
+    }
+
+    // Parse the findings content if it's a string
+    let parsedFindings;
+    try {
+      parsedFindings = typeof findingsData.content === 'string' 
+        ? JSON.parse(findingsData.content) 
+        : findingsData.content;
+    } catch (parseError) {
+      return res.status(500).json({ 
+        error: 'Failed to parse findings', 
+        details: 'Invalid findings format' 
+      });
+    }
+
+    res.json({
+      findings: parsedFindings,
+      message_id: messageId,
+      created_at: findingsData.created_at
+    });
   } catch (error: unknown) {
     console.error('Error fetching findings:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
-    res.status(500).json({ error: 'Failed to fetch findings', details: errorMessage });
+    res.status(500).json({ 
+      error: 'Failed to fetch findings', 
+      details: errorMessage 
+    });
   }
 };

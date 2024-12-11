@@ -196,14 +196,16 @@
 - **Description**: Retrieve compliance findings for a specific message
 - **Success Response**:
   ```json
-  [
-    {
-      "id": "finding-id",
-      "message_id": "message-id",
-      "risk_details": "...",
-      "created_at": "timestamp"
-    }
-  ]
+  {
+    "findings": {
+      "risk_level": "medium",
+      "key_risks": ["Potential risk 1", "Potential risk 2"],
+      "remediation_steps": ["Step 1", "Step 2"],
+      "context_specific_notes": "Additional insights"
+    },
+    "message_id": "message-id",
+    "created_at": "timestamp"
+  }
   ```
 
 ## Health Check
